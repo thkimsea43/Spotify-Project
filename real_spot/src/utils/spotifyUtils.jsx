@@ -13,8 +13,6 @@ export const formatTracks = (trackItems) => {
 
 export const getSongs = (year, tracks) => {
   console.log("Getting songs for year:", year);
-  console.log("getSongs Tracks:", tracks);
-
   return tracks
     .filter((track) => {
       const releaseYear = track.album.release_date?.split("-")[0]; // Extract year from release_date

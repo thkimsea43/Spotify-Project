@@ -63,31 +63,25 @@ const useSpotify = (accessToken) => {
     }
   };
 
-  const createPlaylist = async (year, trackURIs) => {
+  const createPlaylist = async (year, trackURIs, selectedPlaylist) => {
     try {
-      console.log("TrackIDS", trackURIs, year);
-      // Step 1: Create a new playlist
-      const data = await spotifyApi.createPlaylist(year, {
-        description: `Playlist created for the year ${year}`,
-        public: true, 
+      const { body: playlist } = await spotifyApi.createPlaylist(year, {
+        description: `Playlist created for the year ${year}, extracted from the playlist ${selectedPlaylist.name}`,
+        public: true,
       });
 
-      const newPlaylistId = data.body.id;
-      setPlaylists((prevPlaylists) => [...prevPlaylists, data.body]);
-      setNewPlaylistID(newPlaylistId);
+      setPlaylists((prev) => [...prev, playlist]);
+      setNewPlaylistID(playlist.id);
+      console.log("New playlist created:", playlist);
 
-      console.log("New playlist created:", data.body, newPlaylistId);
-
-      // Step 2: Add tracks to the newly created playlist
-      console.log(trackURIs);
-      if (trackURIs.length > 0) {
-        await spotifyApi.addTracksToPlaylist(newPlaylistId, trackURIs);
-        console.log("Tracks added to playlist:", trackURIs);
-      } else {
-        console.log("No tracks to add.");
+      // Add tracks in batches of 100
+      for (let i = 0; i < trackURIs.length; i += 100) {
+        const batch = trackURIs.slice(i, i + 100);
+        await spotifyApi.addTracksToPlaylist(playlist.id, batch);
+        console.log(`Added batch ${i / 100 + 1}:`, batch);
       }
     } catch (error) {
-      console.error("Error creating playlist or adding tracks", error);
+      console.error("Error creating playlist or adding tracks:", error);
     }
   };
 

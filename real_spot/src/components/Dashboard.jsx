@@ -43,7 +43,7 @@ export default function Dashboard({ code }) {
       {selectedPlaylist && (
         <>
           <br></br>
-          <CreatePlaylist tracks={tracks} />
+          <CreatePlaylist tracks={tracks} selectedPlaylist={selectedPlaylist} />
           <a
             href={selectedPlaylist.external_urls.spotify}
             target="_blank"
