@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useAuth from "../hooks/useAuth";
 import useSpotify from "../hooks/useSpotify";
+import { getSongs } from "../utils/spotifyUtils";
 
 const CreatePlaylist = ({ tracks }) => {
   const { createPlaylist } = useSpotify();
@@ -17,24 +17,37 @@ const CreatePlaylist = ({ tracks }) => {
       // You can create a new playlist with the year entered
       console.log(year, tracks);
 
-      createPlaylist(
-        year,
-        tracks.map((track) => track.uri)
-      );
+      const songs = getSongs(year, tracks);
+      console.log(songs);
+      createPlaylist(year, songs);
     }
   };
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
-      setConfirmedValue(year); // Confirm the value
-      onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
+      const currentYear = new Date().getFullYear();
+      if (year && year > 1900 && year <= currentYear) {
+        setConfirmedValue(year); // Confirm the value only if it's valid
+        onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
+      } else {
+        console.error(
+          "Invalid year. Please enter a valid year between 1900 and the current year."
+        );
+      }
     }
   };
 
   // Handler to confirm the input value when clicking "Next"
   const handleNextClick = () => {
-    setConfirmedValue(year); // Confirm the value
-    onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
+    const currentYear = new Date().getFullYear();
+    if (year && year > 1900 && year <= currentYear) {
+      setConfirmedValue(year); // Confirm the value
+      onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
+    } else {
+      console.error(
+        "Invalid year. Please enter a valid year between 1900 and the current year."
+      );
+    }
   };
 
   return (

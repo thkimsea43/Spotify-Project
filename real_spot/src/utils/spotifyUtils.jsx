@@ -11,10 +11,14 @@ export const formatTracks = (trackItems) => {
   }));
 };
 
-export const formatPlaylists = (playlists) => {
-  return playlists.map((playlist) => ({
-    id: playlist.id,
-    name: playlist.name,
-    image: playlist.images.length > 0 ? playlist.images[0].url : null,
-  }));
+export const getSongs = (year, tracks) => {
+  console.log("Getting songs for year:", year);
+  console.log("getSongs Tracks:", tracks);
+
+  return tracks
+    .filter((track) => {
+      const releaseYear = track.album.release_date?.split("-")[0]; // Extract year from release_date
+      return releaseYear == year; // Compare with input year
+    })
+    .map((track) => track.uri); // Return only the track URI
 };

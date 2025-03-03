@@ -69,7 +69,7 @@ const useSpotify = (accessToken) => {
       // Step 1: Create a new playlist
       const data = await spotifyApi.createPlaylist(year, {
         description: `Playlist created for the year ${year}`,
-        public: true, // Change to true if you want it to be public
+        public: true, 
       });
 
       const newPlaylistId = data.body.id;
@@ -79,6 +79,7 @@ const useSpotify = (accessToken) => {
       console.log("New playlist created:", data.body, newPlaylistId);
 
       // Step 2: Add tracks to the newly created playlist
+      console.log(trackURIs);
       if (trackURIs.length > 0) {
         await spotifyApi.addTracksToPlaylist(newPlaylistId, trackURIs);
         console.log("Tracks added to playlist:", trackURIs);
@@ -97,8 +98,8 @@ const useSpotify = (accessToken) => {
     tracks,
     fetchTracks,
     isLoading,
-    createPlaylist, // Expose the createPlaylist function
-    newPlaylistID, // Expose the newPlaylistID state
+    createPlaylist,
+    newPlaylistID,
   };
 };
 
