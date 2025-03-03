@@ -1,8 +1,8 @@
 import { Container, Dropdown } from "react-bootstrap";
 import useAuth from "../hooks/useAuth";
 import useSpotify from "../hooks/useSpotify";
-import TrackList from "./Tracklist";
-import EnterYear from "./EnterYear";
+import TrackList from "./TrackList"; // Fix the file name casing
+import CreatePlaylist from "./CreatePlaylist";
 
 export default function Dashboard({ code }) {
   const accessToken = useAuth(code);
@@ -13,24 +13,7 @@ export default function Dashboard({ code }) {
     tracks,
     fetchTracks,
     isLoading,
-    createPlaylist,
-    addToPlaylist,
-    newPlaylistID,
   } = useSpotify(accessToken);
-
-  // Function to handle the playlist creation based on year
-  const handleCreatePlaylist = (year) => {
-    if (year) {
-      // You can create a new playlist with the year entered
-      createPlaylist(`${year}`, year); // Modify `createPlaylist` to accept year
-    }
-  };
-
-  const handleAddToPlaylist = (playlist) => {
-    if (selectedPlaylist && accessToken) {
-      addToPlaylist(newPlaylistID, [tracks.uri]);
-    }
-  };
 
   return (
     <Container
@@ -47,7 +30,6 @@ export default function Dashboard({ code }) {
             <Dropdown.Item
               key={playlist.id}
               onClick={() => {
-                console.log(playlist.id);
                 setSelectedPlaylist(playlist);
                 fetchTracks(playlist.id);
               }}
@@ -61,10 +43,7 @@ export default function Dashboard({ code }) {
       {selectedPlaylist && (
         <>
           <br></br>
-          <EnterYear
-            onCreatePlaylist={handleCreatePlaylist}
-            onAddToPlaylist={handleAddToPlaylist}
-          />
+          <CreatePlaylist tracks={tracks} />
           <a
             href={selectedPlaylist.external_urls.spotify}
             target="_blank"

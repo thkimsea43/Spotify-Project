@@ -1,6 +1,10 @@
 import { useState } from "react";
+import useAuth from "../hooks/useAuth";
+import useSpotify from "../hooks/useSpotify";
 
-const EnterYear = ({ onCreatePlaylist, onAddToPlaylist }) => {
+const CreatePlaylist = ({ tracks }) => {
+  const { createPlaylist } = useSpotify();
+
   const [year, setYear] = useState("");
   const [confirmedValue, setConfirmedValue] = useState("");
 
@@ -8,19 +12,29 @@ const EnterYear = ({ onCreatePlaylist, onAddToPlaylist }) => {
     setYear(event.target.value);
   };
 
+  const onCreatePlaylist = (year, tracks) => {
+    if (year) {
+      // You can create a new playlist with the year entered
+      console.log(year, tracks);
+
+      createPlaylist(
+        year,
+        tracks.map((track) => track.uri)
+      );
+    }
+  };
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       setConfirmedValue(year); // Confirm the value
-      onCreatePlaylist(year); // Trigger the playlist creation with the year
-      onAddToPlaylist(year); // Trigger the playlist addition with the year
+      onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
     }
   };
 
   // Handler to confirm the input value when clicking "Next"
   const handleNextClick = () => {
     setConfirmedValue(year); // Confirm the value
-    onCreatePlaylist(year); // Trigger the playlist creation with the year
-    onAddToPlaylist(year); // Trigger the playlist addition with the year
+    onCreatePlaylist(year, tracks); // Trigger the playlist creation with the year
   };
 
   return (
@@ -35,9 +49,9 @@ const EnterYear = ({ onCreatePlaylist, onAddToPlaylist }) => {
       />
       <button onClick={handleNextClick}>Next</button>
 
-      <p>You entered: {confirmedValue}</p>
+      {/* <p>You entered: {confirmedValue}</p> */}
     </div>
   );
 };
 
-export default EnterYear;
+export default CreatePlaylist;

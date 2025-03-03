@@ -6,6 +6,7 @@ const TrackList = ({ tracks, isLoading }) => {
   if (isLoading) return <LoadingSpinner />;
 
   const formattedTracks = formatTracks(tracks);
+  // console.log({ formattedTracks });
 
   return (
     <ListGroup style={{ maxWidth: "500px" }}>
@@ -28,6 +29,8 @@ const TrackList = ({ tracks, isLoading }) => {
               <strong>{track.name}</strong>
               <br />
               <small>{track.artists}</small>
+              <br />
+              <small>{track.release_date}</small>
             </div>
           </ListGroup.Item>
         ))

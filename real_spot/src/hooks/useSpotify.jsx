@@ -63,33 +63,30 @@ const useSpotify = (accessToken) => {
     }
   };
 
-  // Create a new playlist based on the year entered
-  const createPlaylist = async (playlistName, year) => {
-    console.log({ tracks });
+  const createPlaylist = async (year, trackURIs) => {
     try {
-      const data = await spotifyApi.createPlaylist(playlistName, {
+      console.log("TrackIDS", trackURIs, year);
+      // Step 1: Create a new playlist
+      const data = await spotifyApi.createPlaylist(year, {
         description: `Playlist created for the year ${year}`,
-        public: true, // You can change this to true if you want the playlist to be public
+        public: true, // Change to true if you want it to be public
       });
 
-      // Add the new playlist to the list of playlists
+      const newPlaylistId = data.body.id;
       setPlaylists((prevPlaylists) => [...prevPlaylists, data.body]);
-      setNewPlaylistID(data.body.id); // Store the ID of the newly created playlist
-      //   console.log("New playlist created:", data.body, data.body.id);
-      //   setSelectedPlaylist(data.body); // Automatically select the newly created playlist
-    } catch (error) {
-      console.error("Error creating playlist", error);
-    }
-  };
+      setNewPlaylistID(newPlaylistId);
 
-  const addToPlaylist = async (trackId, playlistId) => {
-    try {
-      const data = await spotifyApi.addTracksToPlaylist(
-        "3GzFhBVfZBflwqkrNs0J6b",
-        ["spotify:track:0Cu8JdYvV9DdmzLzhxaZLH"]
-      );
+      console.log("New playlist created:", data.body, newPlaylistId);
+
+      // Step 2: Add tracks to the newly created playlist
+      if (trackURIs.length > 0) {
+        await spotifyApi.addTracksToPlaylist(newPlaylistId, trackURIs);
+        console.log("Tracks added to playlist:", trackURIs);
+      } else {
+        console.log("No tracks to add.");
+      }
     } catch (error) {
-      console.error("Error adding track to playlist", error);
+      console.error("Error creating playlist or adding tracks", error);
     }
   };
 
@@ -102,7 +99,6 @@ const useSpotify = (accessToken) => {
     isLoading,
     createPlaylist, // Expose the createPlaylist function
     newPlaylistID, // Expose the newPlaylistID state
-    addToPlaylist, // Expose the addToPlaylist function
   };
 };
 
