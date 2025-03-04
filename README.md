@@ -78,11 +78,6 @@ root/
 - **Fetching Tracks:** Fetches tracks from selected playlists.
 - **Creating Playlists:** Creates new playlists in the user’s Spotify account.
 
-### External API (MusicBrainz)
-
-- **Fetches correct release dates** to compensate for incorrect data on Spotify.
-- Integrated to validate and sort tracks based on accurate metadata.
-
 ## Styling
 
 - Uses **CSS Modules** to keep styles modular and scoped.
