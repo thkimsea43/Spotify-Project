@@ -1,36 +1,38 @@
 import { ListGroup, Image } from "react-bootstrap";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { formatTracks } from "../utils/spotifyUtils";
+import styles from "./TrackList.module.css";
 
 const TrackList = ({ tracks, isLoading }) => {
   if (isLoading) return <LoadingSpinner />;
 
   const formattedTracks = formatTracks(tracks);
-  // console.log({ formattedTracks });
 
   return (
-    <ListGroup style={{ maxWidth: "500px" }}>
+    <ListGroup className={styles.listGroup}>
       {formattedTracks.length === 0 ? (
-        <p className="text-center mt-3">No tracks found in this playlist.</p>
+        <p className={styles.noTracksMessage}>
+          No tracks found in this playlist.
+        </p>
       ) : (
         formattedTracks.map((track, index) => (
           <ListGroup.Item
             key={track.id || index}
-            className="d-flex align-items-center"
+            className={styles.listGroupItem}
           >
             <Image
               src={track.albumImage}
               alt={track.name}
               width="50"
               height="50"
-              className="me-3 rounded"
+              className={styles.albumImage}
             />
             <div>
-              <strong>{track.name}</strong>
+              <strong className={styles.trackDetails}>{track.name}</strong>
               <br />
-              <small>{track.artists}</small>
+              <small className={styles.trackMeta}>{track.artists}</small>
               <br />
-              <small>{track.release_date}</small>
+              <small className={styles.trackMeta}>{track.release_date}</small>
             </div>
           </ListGroup.Item>
         ))

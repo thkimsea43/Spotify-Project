@@ -1,0 +1,28 @@
+/* TrackList.module.css */
+.listGroup {
+    max-width: 500px;
+  }
+  
+  .listGroupItem {
+    display: flex;
+    align-items: center;
+  }
+  
+  .albumImage {
+    margin-right: 1rem;
+    border-radius: 8px;
+  }
+  
+  .trackDetails {
+    font-weight: bold;
+  }
+  
+  .trackMeta {
+    font-size: 0.9rem;
+  }
+  
+  .noTracksMessage {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
