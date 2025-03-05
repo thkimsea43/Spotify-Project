@@ -23,7 +23,9 @@ export default function Dashboard({ code }) {
 
   const handleConfirm = (selectedPlaylistsData) => {
     setSelectedPlaylists(selectedPlaylistsData); // Update useSpotify's state
+    console.log("Selected Playlists:", selectedPlaylistsData);
     setShowPlaylists(false); // Hide PlaylistSelector after confirming
+    fetchTracks(selectedPlaylistsData); // Fetch tracks for the first selected playlist
   };
 
   return (
@@ -47,9 +49,17 @@ export default function Dashboard({ code }) {
 
       {!showPlaylists && (
         <>
+          <br />
+
+          <div className="d-flex flex-column align-items-center p-4 bg-light rounded shadow">
+            <CreatePlaylist
+              tracks={tracks}
+              selectedPlaylists={selectedPlaylists}
+            />
+          </div>
+
           <div className="mt-3">
-            <strong>Selected Playlists:</strong>{" "}
-            {selectedPlaylists.map((playlist) => playlist.name).join(", ")}
+            <TrackList tracks={tracks} isLoading={isLoading} />
           </div>
         </>
       )}

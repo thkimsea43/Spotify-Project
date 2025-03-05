@@ -27,35 +27,34 @@ const useSpotify = (accessToken) => {
     }
   };
 
-  const fetchTracks = async (playlistId) => {
+  const fetchTracks = async (playlists) => {
     setIsLoading(true);
     let allTracks = [];
-    let offset = 0;
     const limit = 100;
 
     try {
-      let response = await spotifyApi.getPlaylistTracks(playlistId, {
-        limit,
-        offset,
-      });
-      allTracks = [
-        ...allTracks,
-        ...response.body.items.map((item) => item.track),
-      ];
+      // Loop through each playlist and fetch tracks
+      for (const playlist of playlists) {
+        let offset = 0;
+        let response;
 
-      while (response.body.next) {
-        offset += limit;
-        response = await spotifyApi.getPlaylistTracks(playlistId, {
-          limit,
-          offset,
-        });
-        allTracks = [
-          ...allTracks,
-          ...response.body.items.map((item) => item.track),
-        ];
+        do {
+          response = await spotifyApi.getPlaylistTracks(playlist.id, {
+            limit,
+            offset,
+          });
+
+          // Add the tracks from this playlist to the allTracks array
+          allTracks = [
+            ...allTracks,
+            ...response.body.items.map((item) => item.track),
+          ];
+
+          offset += limit;
+        } while (response.body.next); // Keep looping until there are no more pages
       }
 
-      setTracks(allTracks);
+      setTracks(allTracks); // Set all tracks after fetching them from all playlists
     } catch (error) {
       console.error("Error fetching tracks:", error);
     } finally {
@@ -63,10 +62,10 @@ const useSpotify = (accessToken) => {
     }
   };
 
-  const createPlaylist = async (year, trackURIs, selectedPlaylist) => {
+  const createPlaylist = async (year, trackURIs) => {
     try {
       const { body: playlist } = await spotifyApi.createPlaylist(year, {
-        description: `Playlist created for the year ${year}, extracted from the playlist ${selectedPlaylist.name}`,
+        description: `Playlist created for the year ${year}, extracted from the playlist `,
         public: true,
       });
 
