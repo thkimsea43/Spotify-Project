@@ -9,7 +9,7 @@ const useSpotify = (accessToken) => {
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [selectedPlaylists, setSelectedPlaylists] = useState([]);
   const [newPlaylistID, setNewPlaylistID] = useState("");
 
   useEffect(() => {
@@ -87,8 +87,8 @@ const useSpotify = (accessToken) => {
 
   return {
     playlists,
-    selectedPlaylist,
-    setSelectedPlaylist,
+    selectedPlaylists,
+    setSelectedPlaylists,
     tracks,
     fetchTracks,
     isLoading,
