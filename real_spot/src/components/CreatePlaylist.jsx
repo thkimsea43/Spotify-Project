@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSpotify from "../hooks/useSpotify";
 import { getSongs } from "../utils/spotifyUtils";
 import styles from "./CreatePlaylist.module.css"; // Import the CSS Module
@@ -9,6 +9,10 @@ const CreatePlaylist = ({ tracks }) => {
   const [year, setYear] = useState("");
   const [confirmedValue, setConfirmedValue] = useState("");
   const [isHovered, setIsHovered] = useState(false); // Track hover state for button styling
+
+  useEffect(() => {
+    console.log("Updated tracks state: Create", tracks);
+  }, [tracks]);
 
   const handleInputChange = (event) => {
     setYear(event.target.value);

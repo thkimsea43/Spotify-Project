@@ -5,7 +5,7 @@ import styles from "./TrackList.module.css";
 
 const TrackList = ({ tracks, isLoading }) => {
   if (isLoading) return <LoadingSpinner />;
-
+  
   const formattedTracks = formatTracks(tracks);
 
   return (

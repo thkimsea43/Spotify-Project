@@ -11,6 +11,7 @@ const useSpotify = (accessToken) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPlaylists, setSelectedPlaylists] = useState([]);
   const [newPlaylistID, setNewPlaylistID] = useState("");
+  const [fetchingPlaylists, setFetchingPlaylists] = useState(new Set());
 
   useEffect(() => {
     if (!accessToken) return;
@@ -43,7 +44,10 @@ const useSpotify = (accessToken) => {
   };
 
   const fetchTracksForPlaylist = async (playlist) => {
-    let playlistTracks = [];
+    if (fetchingPlaylists.has(playlist.id)) return; // Prevent duplicate fetches
+
+    setFetchingPlaylists((prev) => new Set(prev).add(playlist.id));
+
     let offset = 0;
     const limit = 100;
 
@@ -54,10 +58,15 @@ const useSpotify = (accessToken) => {
           limit,
           offset,
         });
-        playlistTracks = [
-          ...playlistTracks,
-          ...response.body.items.map((item) => item.track),
-        ];
+
+        const newTracks = response.body.items.map((item) => ({
+          ...item.track,
+          playlistId: playlist.id,
+        }));
+
+        // Dynamically update tracks **while fetching**
+        setTracks((prevTracks) => [...prevTracks, ...newTracks]);
+
         offset += limit;
       } while (response.body.next);
     } catch (error) {
@@ -65,38 +74,38 @@ const useSpotify = (accessToken) => {
         `Error fetching tracks for playlist ${playlist.name}:`,
         error
       );
+    } finally {
+      // Remove from fetching list after it's done
+      setFetchingPlaylists((prev) => {
+        const updated = new Set(prev);
+        updated.delete(playlist.id);
+        return updated;
+      });
     }
-    // console.log(playlistTracks);
-    return playlistTracks;
   };
 
   const handlePlaylistSelection = async (playlist) => {
-    setIsLoading(true);
     setSelectedPlaylists((prevSelected) => {
       const isAlreadySelected = prevSelected.some((p) => p.id === playlist.id);
 
       if (isAlreadySelected) {
+        // Stop fetching if deselected & remove tracks
+        setFetchingPlaylists((prev) => {
+          const updated = new Set(prev);
+          updated.delete(playlist.id);
+          return updated;
+        });
+
         setTracks((prevTracks) =>
-          prevTracks.filter(
-            (track) => !track.playlistId || track.playlistId !== playlist.id
-          )
+          prevTracks.filter((track) => track.playlistId !== playlist.id)
         );
+
         return prevSelected.filter((p) => p.id !== playlist.id);
       } else {
-        fetchTracksForPlaylist(playlist).then((playlistTracks) => {
-          setTracks((prevTracks) => [
-            ...prevTracks,
-            ...playlistTracks.map((track) => ({
-              ...track,
-              playlistId: playlist.id,
-            })),
-          ]);
-        });
+        fetchTracksForPlaylist(playlist); // Continue fetching even after confirmation
         return [...prevSelected, playlist];
       }
     });
-    console.log(tracks);
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -139,6 +148,7 @@ const useSpotify = (accessToken) => {
     selectedPlaylists,
     setSelectedPlaylists,
     handlePlaylistSelection,
+    fetchTracksForPlaylist,
     confirmSelection,
     clearSelection,
     tracks,

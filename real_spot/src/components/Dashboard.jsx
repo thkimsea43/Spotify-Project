@@ -19,15 +19,20 @@ export default function Dashboard({ code }) {
     tracks,
     setTracks,
     isLoading,
+    fetchTracksForPlaylist, // 🔥 Fetching continues even after confirmation
   } = useSpotify(accessToken);
 
-  const handleConfirm = (selectedPlaylists, tracks) => {
-    setSelectedPlaylists(selectedPlaylists); // Update useSpotify's state
-    setTracks(tracks);
-    console.log("Selected Playlists:", selectedPlaylists);
-    setShowPlaylists(false); // Hide PlaylistSelector after confirming
-    setShowTrackList(true); // Show TrackList after confirming playlist selection
+  const handleConfirm = (selectedPlaylists) => {
+    setSelectedPlaylists(selectedPlaylists); // Update selected playlists
+    setShowPlaylists(false); // Hide PlaylistSelector
+    setShowTrackList(true); // Show TrackList
+
+    selectedPlaylists.forEach((playlist) => fetchTracksForPlaylist(playlist));
   };
+
+  useEffect(() => {
+    console.log("Updated tracks state: Dashboard", tracks);
+  }, [tracks]);
 
   return (
     <Container className={styles.container}>

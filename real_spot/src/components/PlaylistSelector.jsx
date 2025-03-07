@@ -53,7 +53,7 @@ const PlaylistSelector = ({ accessToken, onConfirm }) => {
         <button
           onClick={() => {
             confirmSelection();
-            onConfirm(selectedPlaylists, tracks); // Notify parent component
+            onConfirm(selectedPlaylists, tracks);
           }}
           className={`${styles.button} ${styles.buttonPrimary}`}
         >
