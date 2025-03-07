@@ -60,8 +60,13 @@ const useSpotify = (accessToken) => {
         });
 
         const newTracks = response.body.items.map((item) => ({
-          ...item.track,
+          album: item.track.album,
+          artists: item.track.artists,
+          id: item.track.id,
+          name: item.track.name,
+          uri: item.track.uri,
           playlistId: playlist.id,
+          playlistName: playlist.name,
         }));
 
         // Dynamically update tracks **while fetching**
@@ -107,10 +112,6 @@ const useSpotify = (accessToken) => {
       }
     });
   };
-
-  useEffect(() => {
-    console.log("Updated tracks state:", tracks);
-  }, [tracks]);
 
   const clearSelection = () => {
     setSelectedPlaylists([]);

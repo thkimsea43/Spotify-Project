@@ -10,10 +10,6 @@ const CreatePlaylist = ({ tracks }) => {
   const [confirmedValue, setConfirmedValue] = useState("");
   const [isHovered, setIsHovered] = useState(false); // Track hover state for button styling
 
-  useEffect(() => {
-    console.log("Updated tracks state: Create", tracks);
-  }, [tracks]);
-
   const handleInputChange = (event) => {
     setYear(event.target.value);
   };

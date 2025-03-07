@@ -19,7 +19,7 @@ export default function Dashboard({ code }) {
     tracks,
     setTracks,
     isLoading,
-    fetchTracksForPlaylist, // 🔥 Fetching continues even after confirmation
+    fetchTracksForPlaylist,
   } = useSpotify(accessToken);
 
   const handleConfirm = (selectedPlaylists) => {
@@ -29,10 +29,6 @@ export default function Dashboard({ code }) {
 
     selectedPlaylists.forEach((playlist) => fetchTracksForPlaylist(playlist));
   };
-
-  useEffect(() => {
-    console.log("Updated tracks state: Dashboard", tracks);
-  }, [tracks]);
 
   return (
     <Container className={styles.container}>
@@ -53,7 +49,6 @@ export default function Dashboard({ code }) {
           </div>
 
           <div className="mt-3">
-            {isLoading && <p>Fetching tracks, please wait...</p>}
             <TrackList tracks={tracks} />
           </div>
         </>
