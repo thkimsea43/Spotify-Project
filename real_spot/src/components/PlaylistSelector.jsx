@@ -1,40 +1,65 @@
-import { useState } from "react";
-import styles from "./Dashboard.module.css";
+import useSpotify from "../hooks/useSpotify";
+import styles from "./PlaylistSelector.module.css";
+import LoadingSpinner from "./LoadingSpinner";
 
-const PlaylistSelector = ({ playlists, onConfirm }) => {
-  const [selectedPlaylists, setSelectedPlaylists] = useState([]);
+const PlaylistSelector = ({ accessToken, onConfirm }) => {
+  const {
+    tracks,
+    playlists,
+    selectedPlaylists,
+    isLoading,
+    handlePlaylistSelection,
+    confirmSelection,
+    clearSelection,
+  } = useSpotify(accessToken);
 
-  const handleCheckboxChange = (playlist) => {
-    setSelectedPlaylists(
-      (prevSelected) =>
-        prevSelected.some((p) => p.id === playlist.id)
-          ? prevSelected.filter((p) => p.id !== playlist.id) // Remove if already selected
-          : [...prevSelected, playlist] // Add if not selected
-    );
-  };
-
-  const handleConfirm = () => {
-    onConfirm(selectedPlaylists); // Pass selected playlists to Dashboard
-    // setSelectedPlaylists([]); // Clear UI selection
-  };
+  if (isLoading) return <LoadingSpinner />;
 
   return (
-    <div>
-      <h5>Select Playlists:</h5>
-      {playlists.map((playlist) => (
-        <div key={playlist.id}>
-          <input
-            type="checkbox"
-            id={playlist.id}
-            checked={selectedPlaylists.some((p) => p.id === playlist.id)}
-            onChange={() => handleCheckboxChange(playlist)}
-          />
-          <label htmlFor={playlist.id}>{playlist.name}</label>
-        </div>
-      ))}
-      <button onClick={handleConfirm} className={`${styles.button} `}>
-        Confirm Selection
-      </button>
+    <div className={styles.playlistContainer}>
+      <div className={styles.buttonContainer}>
+        <button
+          onClick={clearSelection}
+          className={`${styles.button} ${styles.buttonPrimary}`}
+        >
+          Clear
+        </button>
+      </div>
+      <h5 className={styles.sectionTitle}>Select Playlists:</h5>
+      <div className={styles.playlistList}>
+        {playlists.map((playlist) => (
+          <div
+            key={playlist.id}
+            className={styles.playlistItem}
+            onClick={() => handlePlaylistSelection(playlist)}
+            tabIndex="0"
+            onKeyDown={(event) =>
+              event.key === "Enter" && handlePlaylistSelection(playlist)
+            }
+          >
+            <input
+              type="checkbox"
+              checked={selectedPlaylists.some((p) => p.id === playlist.id)}
+              readOnly
+              className={styles.checkbox}
+            />
+            <label className={styles.playlistLabel}>
+              <strong>{playlist.name}</strong> Tracks: {playlist.tracks.total}
+            </label>
+          </div>
+        ))}
+      </div>
+      <div className={styles.buttonContainer}>
+        <button
+          onClick={() => {
+            confirmSelection();
+            onConfirm(selectedPlaylists, tracks); // Notify parent component
+          }}
+          className={`${styles.button} ${styles.buttonPrimary}`}
+        >
+          Confirm Selection
+        </button>
+      </div>
     </div>
   );
 };

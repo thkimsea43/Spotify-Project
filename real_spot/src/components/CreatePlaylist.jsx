@@ -3,7 +3,7 @@ import useSpotify from "../hooks/useSpotify";
 import { getSongs } from "../utils/spotifyUtils";
 import styles from "./CreatePlaylist.module.css"; // Import the CSS Module
 
-const CreatePlaylist = ({ tracks, selectedPlaylists }) => {
+const CreatePlaylist = ({ tracks }) => {
   const { createPlaylist } = useSpotify();
 
   const [year, setYear] = useState("");

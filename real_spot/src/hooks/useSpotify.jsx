@@ -8,7 +8,7 @@ const spotifyApi = new SpotifyWebApi({
 const useSpotify = (accessToken) => {
   const [playlists, setPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedPlaylists, setSelectedPlaylists] = useState([]);
   const [newPlaylistID, setNewPlaylistID] = useState("");
 
@@ -19,65 +19,115 @@ const useSpotify = (accessToken) => {
   }, [accessToken]);
 
   const fetchPlaylists = async () => {
+    setIsLoading(true);
+    let allPlaylists = [];
+
     try {
-      const data = await spotifyApi.getUserPlaylists();
-      setPlaylists(data.body.items);
+      let data;
+      do {
+        data = await spotifyApi.getUserPlaylists({
+          offset: allPlaylists.length,
+        });
+        allPlaylists = [...allPlaylists, ...data.body.items];
+      } while (data.body.next);
+
+      // Sort playlists by track count (descending order)
+      setPlaylists(
+        allPlaylists.sort((a, b) => b.tracks.total - a.tracks.total)
+      );
     } catch (error) {
       console.error("Error fetching playlists:", error);
-    }
-  };
-
-  const fetchTracks = async (playlists) => {
-    setIsLoading(true);
-    let allTracks = [];
-    const limit = 100;
-
-    try {
-      // Loop through each playlist and fetch tracks
-      for (const playlist of playlists) {
-        let offset = 0;
-        let response;
-
-        do {
-          response = await spotifyApi.getPlaylistTracks(playlist.id, {
-            limit,
-            offset,
-          });
-
-          // Add the tracks from this playlist to the allTracks array
-          allTracks = [
-            ...allTracks,
-            ...response.body.items.map((item) => item.track),
-          ];
-
-          offset += limit;
-        } while (response.body.next); // Keep looping until there are no more pages
-      }
-
-      setTracks(allTracks); // Set all tracks after fetching them from all playlists
-    } catch (error) {
-      console.error("Error fetching tracks:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const fetchTracksForPlaylist = async (playlist) => {
+    let playlistTracks = [];
+    let offset = 0;
+    const limit = 100;
+
+    try {
+      let response;
+      do {
+        response = await spotifyApi.getPlaylistTracks(playlist.id, {
+          limit,
+          offset,
+        });
+        playlistTracks = [
+          ...playlistTracks,
+          ...response.body.items.map((item) => item.track),
+        ];
+        offset += limit;
+      } while (response.body.next);
+    } catch (error) {
+      console.error(
+        `Error fetching tracks for playlist ${playlist.name}:`,
+        error
+      );
+    }
+    // console.log(playlistTracks);
+    return playlistTracks;
+  };
+
+  const handlePlaylistSelection = async (playlist) => {
+    setIsLoading(true);
+    setSelectedPlaylists((prevSelected) => {
+      const isAlreadySelected = prevSelected.some((p) => p.id === playlist.id);
+
+      if (isAlreadySelected) {
+        setTracks((prevTracks) =>
+          prevTracks.filter(
+            (track) => !track.playlistId || track.playlistId !== playlist.id
+          )
+        );
+        return prevSelected.filter((p) => p.id !== playlist.id);
+      } else {
+        fetchTracksForPlaylist(playlist).then((playlistTracks) => {
+          setTracks((prevTracks) => [
+            ...prevTracks,
+            ...playlistTracks.map((track) => ({
+              ...track,
+              playlistId: playlist.id,
+            })),
+          ]);
+        });
+        return [...prevSelected, playlist];
+      }
+    });
+    console.log(tracks);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    console.log("Updated tracks state:", tracks);
+  }, [tracks]);
+
+  const clearSelection = () => {
+    setSelectedPlaylists([]);
+    setTracks([]);
+  };
+
+  const confirmSelection = () => {
+    console.log(tracks);
+    console.log("Selected playlists confirmed:", selectedPlaylists);
+  };
+
   const createPlaylist = async (year, trackURIs) => {
     try {
       const { body: playlist } = await spotifyApi.createPlaylist(year, {
-        description: `Playlist created for the year ${year}, extracted from the playlist `,
+        description: `Songs released in ${year}`,
         public: true,
       });
 
       setPlaylists((prev) => [...prev, playlist]);
       setNewPlaylistID(playlist.id);
-      console.log("New playlist created:", playlist);
 
-      // Add tracks in batches of 100
       for (let i = 0; i < trackURIs.length; i += 100) {
-        const batch = trackURIs.slice(i, i + 100);
-        await spotifyApi.addTracksToPlaylist(playlist.id, batch);
-        console.log(`Added batch ${i / 100 + 1}:`, batch);
+        await spotifyApi.addTracksToPlaylist(
+          playlist.id,
+          trackURIs.slice(i, i + 100)
+        );
       }
     } catch (error) {
       console.error("Error creating playlist or adding tracks:", error);
@@ -88,8 +138,11 @@ const useSpotify = (accessToken) => {
     playlists,
     selectedPlaylists,
     setSelectedPlaylists,
+    handlePlaylistSelection,
+    confirmSelection,
+    clearSelection,
     tracks,
-    fetchTracks,
+    setTracks,
     isLoading,
     createPlaylist,
     newPlaylistID,
