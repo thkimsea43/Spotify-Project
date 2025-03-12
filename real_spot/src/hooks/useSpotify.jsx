@@ -12,6 +12,7 @@ const useSpotify = (accessToken) => {
   const [selectedPlaylists, setSelectedPlaylists] = useState([]);
   const [newPlaylistID, setNewPlaylistID] = useState("");
   const [fetchingPlaylists, setFetchingPlaylists] = useState(new Set());
+  const [playlistCreationStatus, setPlaylistCreationStatus] = useState(null);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -139,8 +140,10 @@ const useSpotify = (accessToken) => {
           trackURIs.slice(i, i + 100)
         );
       }
+      setPlaylistCreationStatus("Playlist created successfully!");
     } catch (error) {
       console.error("Error creating playlist or adding tracks:", error);
+      setPlaylistCreationStatus("Failed to create playlist.");
     }
   };
 
@@ -157,6 +160,7 @@ const useSpotify = (accessToken) => {
     isLoading,
     createPlaylist,
     newPlaylistID,
+    playlistCreationStatus,
   };
 };
 

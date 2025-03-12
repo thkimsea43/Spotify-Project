@@ -45,7 +45,7 @@ export default function Dashboard({ code }) {
         <>
           <br />
           <div className="d-flex flex-column align-items-center p-4 bg-light rounded shadow">
-            <CreatePlaylist tracks={tracks} />
+            <CreatePlaylist accessToken={accessToken} tracks={tracks} />
           </div>
 
           <div className="mt-3">

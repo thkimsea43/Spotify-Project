@@ -2,7 +2,7 @@ import { ListGroup, Image } from "react-bootstrap";
 import { formatTracks } from "../utils/spotifyUtils";
 import styles from "./TrackList.module.css";
 
-const TrackList = ({ tracks, isLoading }) => {
+const TrackList = ({ tracks }) => {
   const formattedTracks = formatTracks(tracks);
 
   return (
