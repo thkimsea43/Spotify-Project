@@ -6,6 +6,8 @@ Spotify Playlist Manager is a React-based web application that allows users to a
 
 This project was stemmed from a simple need to manage and organize my personal Spotify playlists. It honestly still amazes me that Spotify doesn't have a built-in feature to do this. I will continue to improve this project as my needs evolve and I really hope Spotify will eventually add this feature.
 
+Update: As of 6/11/2025, Spotify added the release date of albums in a recent update
+
 Just a point of clarification: This is different than Spotify's Wrapped (year end review) feature. My goal was simply to create a tool to help me manage my playlists by songs' release year.
 
 ## Features
